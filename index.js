@@ -12,6 +12,7 @@ app.use(express.json());
 
 function verifyJwt(req, res, next) {
   const authHeader = req.headers.authorization;
+  console.log(authHeader)
   if (!authHeader) {
     return res.status(401).send({ message: 'Unauthorized access' });
   }
@@ -46,9 +47,20 @@ async function run() {
 
 
 
-    app.get('/user', async (req, res) => {
+    app.get('/user', verifyJwt, async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users)
+    })
+
+
+    app.put('/user/admin/:email', async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: {role: 'admin'},
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
     })
 
     
@@ -62,7 +74,7 @@ async function run() {
         $set: user,
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
-      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
       res.send({result, token});
     })
 
