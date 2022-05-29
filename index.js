@@ -43,6 +43,7 @@ async function run() {
     const reviewCollection = client.db('vehicleParts').collection('reviews');
     const orderCollection = client.db('vehicleParts').collection('order');
     const userCollection = client.db('vehicleParts').collection('users');
+    const profileCollection = client.db('vehicleParts').collection('profiles');
 
 
 
@@ -91,6 +92,26 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc, options);
       const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
       res.send({result, token});
+    })
+
+
+    app.get('/userProfile/:email', async(req, res) => {
+      const email = req.params.email;
+      const user = await profileCollection.findOne({email: email});
+      res.send(user);
+    })
+
+
+    app.put('/userProfile/:email', async (req, res) => {
+      const email = req.params.email;
+      const profile = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: profile,
+      };
+      const result = await profileCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
     })
 
 
@@ -162,6 +183,7 @@ async function run() {
 
     app.post('/reviews', async (req, res) => {
       const review = req.body;
+      console.log(review);
       const result = await reviewCollection.insertOne(review);
       res.send(result);
       
