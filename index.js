@@ -10,6 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 
+// Jwt verify
+
 function verifyJwt(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -39,6 +41,8 @@ async function run() {
   try {
     await client.connect();
 
+    // Collections
+
     const productCollection = client.db('vehicleParts').collection('products');
     const reviewCollection = client.db('vehicleParts').collection('reviews');
     const orderCollection = client.db('vehicleParts').collection('order');
@@ -46,6 +50,8 @@ async function run() {
     const profileCollection = client.db('vehicleParts').collection('profiles');
 
 
+
+    // user api
 
     app.get('/user', verifyJwt, async (req, res) => {
       const users = await userCollection.find().toArray();
@@ -95,6 +101,9 @@ async function run() {
     })
 
 
+
+    // profile api
+
     app.get('/userProfile/:email', async(req, res) => {
       const email = req.params.email;
       const user = await profileCollection.findOne({email: email});
@@ -115,6 +124,8 @@ async function run() {
     })
 
 
+
+    // product api
 
     app.get('/products', async(req, res) => {
       const query = {};
@@ -146,6 +157,8 @@ async function run() {
 
 
 
+  // order api
+
     app.get('/order', async (req, res) => {
           const email = req.query.email;
           const query = {email: email};
@@ -172,6 +185,8 @@ async function run() {
 });
     
 
+
+  // review api
 
     app.get('/reviews', async (req, res) => {
       const query = {};
