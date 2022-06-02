@@ -159,7 +159,7 @@ async function run() {
 
     // order api
 
-    app.get('/order', async (req, res) => {
+    app.get('/orders', async (req, res) => {
       const orders = await orderCollection.find().toArray();
       res.send(orders)
     })
